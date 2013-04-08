@@ -1,6 +1,6 @@
 name: HilightNotifier
 main: me.blha303.HilightNotifier
-version: 1
+version: 1.1
 author: blha303
 commands:
   hladd:

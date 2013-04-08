@@ -59,7 +59,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
         		if (contains(msg, hilight)) {
             		if (!player.getName().equals(sender.getName()) && !alreadymatched) {
             			event.getRecipients().remove(player);
-            			String newmessage = msg.replaceAll(hilight, ChatColor.YELLOW + hilight);
+            			String newmessage = msg.replaceAll(hilight, ChatColor.YELLOW + hilight + ChatColor.RESET);
             			player.playSound(player.getLocation(), Sound.ORB_PICKUP, 10.0F, 1.0F);
             			player.sendMessage(String.format(event.getFormat(), sender.getDisplayName(), newmessage));
             			alreadymatched = true;
