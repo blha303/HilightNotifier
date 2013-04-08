@@ -1,0 +1,8 @@
+name: HilightNotifier
+main: me.blha303.HilightNotifier
+version: 1
+author: blha303
+commands:
+  hladd:
+    description: Adds a new word to ping yourself with
+    usage: /hladd <word>...
