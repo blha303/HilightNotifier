@@ -52,10 +52,10 @@ public class HilightNotifier extends JavaPlugin implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onChat(AsyncPlayerChatEvent event) {
         Player sender = event.getPlayer();
-        String msg = ChatColor.stripColor(event.getMessage());
+        String msg = event.getMessage();
         Player[] playerlist;
         List<String> hilightslist = new ArrayList<String>();
         boolean alreadymatched = false;
