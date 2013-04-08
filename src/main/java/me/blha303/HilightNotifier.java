@@ -53,7 +53,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
             		if (!player.getName().equals(sender.getName())) {
             			String newmessage = msg.replaceAll(player.getName(), ChatColor.YELLOW + player.getName());
             			player.playSound(player.getLocation(), Sound.ORB_PICKUP, 10.0F, 1.0F);
-            			player.sendMessage(newmessage);
+            			player.sendMessage(String.format(event.getFormat(), sender.getDisplayName(), newmessage));
             			event.getRecipients().remove(player);
             		}
             	}
