@@ -46,15 +46,17 @@ public class HilightNotifier extends JavaPlugin implements Listener {
     public void onChat(AsyncPlayerChatEvent event) {
         Player sender = event.getPlayer();
         String msg = ChatColor.stripColor(event.getMessage());
+        boolean alreadymatched = false;
 
         for (Player player : getServer().getOnlinePlayers()) {
         	for (String hilight : getConfig().getStringList("hilights." + player.getName())) {
         		if (contains(msg, hilight)) {
-            		if (!player.getName().equals(sender.getName())) {
+            		if (!player.getName().equals(sender.getName()) && !alreadymatched) {
+            			event.getRecipients().remove(player);
             			String newmessage = msg.replaceAll(player.getName(), ChatColor.YELLOW + player.getName());
             			player.playSound(player.getLocation(), Sound.ORB_PICKUP, 10.0F, 1.0F);
             			player.sendMessage(String.format(event.getFormat(), sender.getDisplayName(), newmessage));
-            			event.getRecipients().remove(player);
+            			alreadymatched = true;
             		}
             	}
         	}
