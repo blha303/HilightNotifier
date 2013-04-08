@@ -9,6 +9,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -23,7 +24,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
         	if (!getConfig().contains("hilights." + p.getName())) {
         		List<String> list = new ArrayList<String>();
                 list.add(p.getName());
-                getConfig().set("hilights." + p.getName(), list);
+                getConfig().addDefault("hilights." + p.getName(), list);
         	}
         }
         List<String> example = new ArrayList<String>();
@@ -31,6 +32,11 @@ public class HilightNotifier extends JavaPlugin implements Listener {
         getConfig().addDefault("hilights.blha303", example);
         getConfig().options().copyDefaults(true);
         saveConfig();
+    }
+    
+    @Override
+    public void onDisable() {
+    	saveConfig();
     }
 
     @EventHandler
@@ -42,7 +48,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onChat(AsyncPlayerChatEvent event) {
         Player sender = event.getPlayer();
         String msg = ChatColor.stripColor(event.getMessage());
@@ -53,7 +59,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
         		if (contains(msg, hilight)) {
             		if (!player.getName().equals(sender.getName()) && !alreadymatched) {
             			event.getRecipients().remove(player);
-            			String newmessage = msg.replaceAll(player.getName(), ChatColor.YELLOW + player.getName());
+            			String newmessage = msg.replaceAll(hilight, ChatColor.YELLOW + hilight);
             			player.playSound(player.getLocation(), Sound.ORB_PICKUP, 10.0F, 1.0F);
             			player.sendMessage(String.format(event.getFormat(), sender.getDisplayName(), newmessage));
             			alreadymatched = true;
@@ -67,17 +73,16 @@ public class HilightNotifier extends JavaPlugin implements Listener {
 		if (sender instanceof Player) {
 			List<String> list = getConfig().getStringList("hilights." + sender.getName());	
 			if (args.length == 0) return false;
-			for (int i = 0; i<=args.length; i++) {
+			for (int i = 0; i<args.length;) {
+				if (list.contains(args[i])) {
+					sender.sendMessage("You already have that string set to ping you.");
+					return true;
+				}
 				list.add(args[i]);
+				i++;
 			}
 			getConfig().set("hilights." + sender.getName(), list);
-			String delim = "";
-			String listout = "";
-			for (String i : list) {
-				listout.concat(delim).concat(i);
-				delim = ",";
-			}
-			sender.sendMessage("Hilight list: " + listout);
+			sender.sendMessage("Hilight list: " + list.toArray().toString());
 			return true;
 		} else {
 			if (args.length == 0) {
@@ -90,17 +95,21 @@ public class HilightNotifier extends JavaPlugin implements Listener {
 			} else {
 				String name = getServer().getPlayer(args[0]).getName();
 				List<String> list = getConfig().getStringList("hilights." + name);	
-				for (int i = 1; i<=args.length; i++) {
+				for (int i = 1; i<args.length; i++) {
+					if (list.contains(args[i])) {
+						sender.sendMessage("That player already has that string set to ping them.");
+						return true;
+					}
 					list.add(args[i]);
 				}
-				getConfig().set("hilights." + name, list);
+				getConfig().set("hilights." + name, list.toArray());
 				String delim = "";
 				String listout = "";
 				for (String i : list) {
 					listout.concat(delim).concat(i);
 					delim = ",";
 				}
-				sender.sendMessage(String.format("Hilight list for %s: %s", name, listout));
+				sender.sendMessage(String.format("Hilight list for %s: %s", name, list.toArray().toString()));
 				return true;
 			}
 			
