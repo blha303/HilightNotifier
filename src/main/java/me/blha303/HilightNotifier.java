@@ -2,6 +2,8 @@ package me.blha303;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Sound;
@@ -17,58 +19,86 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class HilightNotifier extends JavaPlugin implements Listener {
 
-    @Override
-    public void onEnable() {
-        getServer().getPluginManager().registerEvents(this, this);
-        for (Player p : getServer().getOnlinePlayers()) {
-        	if (!getConfig().contains("hilights." + p.getName())) {
-        		List<String> list = new ArrayList<String>();
-                list.add(p.getName());
-                getConfig().addDefault("hilights." + p.getName(), list);
-        	}
-        }
-        List<String> example = new ArrayList<String>();
-        example.add("blha303"); example.add("blha"); example.add("steven");
-        getConfig().addDefault("hilights.blha303", example);
-        getConfig().options().copyDefaults(true);
-        saveConfig();
-    }
-    
-    @Override
-    public void onDisable() {
-    	saveConfig();
-    }
+	@Override
+	public void onEnable() {
+		getServer().getPluginManager().registerEvents(this, this);
+		for (Player p : getServer().getOnlinePlayers()) {
+			if (!getConfig().contains("hilights." + p.getName())) {
+				List<String> list = new ArrayList<String>();
+				list.add(p.getName());
+				getConfig().addDefault("hilights." + p.getName(), list);
+			}
+		}
+		List<String> example = new ArrayList<String>();
+		example.add("blha303"); example.add("blha"); example.add("steven");
+		getConfig().addDefault("hilights.blha303", example);
+		getConfig().options().copyDefaults(true);
+		saveConfig();
+	}
+	
+	@Override
+	public void onDisable() {
+		saveConfig();
+	}
 
-    @EventHandler
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        if (!getConfig().contains("hilights." + event.getPlayer().getName())) {
-            List<String> list = new ArrayList<String>();
-            list.add(event.getPlayer().getName());
-            getConfig().set("hilights." + event.getPlayer().getName(), list);
-        }
-    }
+	@EventHandler
+	public void onPlayerJoin(PlayerJoinEvent event) {
+		if (!getConfig().contains("hilights." + event.getPlayer().getName())) {
+			List<String> list = new ArrayList<String>();
+			list.add(event.getPlayer().getName());
+			getConfig().set("hilights." + event.getPlayer().getName(), list);
+		}
+	}
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onChat(AsyncPlayerChatEvent event) {
-        Player sender = event.getPlayer();
-        String msg = ChatColor.stripColor(event.getMessage());
-        boolean alreadymatched = false;
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onChat(AsyncPlayerChatEvent event) {
+		Player sender = event.getPlayer();
+		String msg = ChatColor.stripColor(event.getMessage());
+		Player[] playerlist = null;
+		List<String> hilightslist = new ArrayList<String>();
+		boolean alreadymatched = false;
+		Future<Player[]> onlinePlayersFuture = getServer().getScheduler().callSyncMethod(this, new Callable<Player[]>() {
 
-        for (Player player : getServer().getOnlinePlayers()) {
-        	for (String hilight : getConfig().getStringList("hilights." + player.getName())) {
-        		if (contains(msg, hilight)) {
-            		if (!player.getName().equals(sender.getName()) && !alreadymatched) {
-            			event.getRecipients().remove(player);
-            			String newmessage = msg.replaceAll(hilight, ChatColor.YELLOW + hilight + ChatColor.RESET);
-            			player.playSound(player.getLocation(), Sound.ORB_PICKUP, 10.0F, 1.0F);
-            			player.sendMessage(String.format(event.getFormat(), sender.getDisplayName(), newmessage));
-            			alreadymatched = true;
-            		}
-            	}
-        	}
-        }
-    }
-    
+			public Player[] call() throws Exception {
+				return getServer().getOnlinePlayers();
+			}
+			
+		});
+		try { 
+			playerlist = onlinePlayersFuture.get(); 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		if (playerlist == null) return;
+		for (final Player player : playerlist) {
+			Future<List<String>> hilightslistfuture = getServer().getScheduler().callSyncMethod(this, new Callable<List<String>>() {
+
+				public List<String> call() throws Exception {
+					return getConfig().getStringList("hilights." + player.getName());
+				}
+				
+			});
+			try {
+				hilightslist = hilightslistfuture.get();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			if (hilightslist == null) return;
+			for (String hilight : hilightslist) {
+				if (contains(msg, hilight)) {
+					if (!player.getName().equals(sender.getName()) && !alreadymatched) {
+						event.getRecipients().remove(player);
+						String newmessage = msg.replaceAll(hilight, ChatColor.YELLOW + hilight + ChatColor.RESET);
+						player.playSound(player.getLocation(), Sound.ORB_PICKUP, 10.0F, 1.0F);
+						player.sendMessage(String.format(event.getFormat(), sender.getDisplayName(), newmessage));
+						alreadymatched = true;
+					}
+				}
+			}
+		}
+	}
+	
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if (sender instanceof Player) {
 			List<String> list = getConfig().getStringList("hilights." + sender.getName());	
@@ -115,7 +145,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
 			
 		}
 	}
-    
+	
 	// http://stackoverflow.com/a/2275030
 	public boolean contains(String haystack, String needle) {
 		haystack = haystack == null ? "" : haystack;
