@@ -54,7 +54,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
 	public void onChat(AsyncPlayerChatEvent event) {
 		Player sender = event.getPlayer();
 		String msg = ChatColor.stripColor(event.getMessage());
-		Player[] playerlist = null;
+		Player[] playerlist;
 		List<String> hilightslist = new ArrayList<String>();
 		boolean alreadymatched = false;
 		Future<Player[]> onlinePlayersFuture = getServer().getScheduler().callSyncMethod(this, new Callable<Player[]>() {
@@ -62,14 +62,14 @@ public class HilightNotifier extends JavaPlugin implements Listener {
 			public Player[] call() throws Exception {
 				return getServer().getOnlinePlayers();
 			}
-			
+
 		});
 		try { 
 			playerlist = onlinePlayersFuture.get(); 
 		} catch (Exception e) {
-			e.printStackTrace();
+			return;
 		}
-		
+
 		if (playerlist == null) return;
 		for (final Player player : playerlist) {
 			Future<List<String>> hilightslistfuture = getServer().getScheduler().callSyncMethod(this, new Callable<List<String>>() {
@@ -77,14 +77,13 @@ public class HilightNotifier extends JavaPlugin implements Listener {
 				public List<String> call() throws Exception {
 					return getConfig().getStringList("hilights." + player.getName());
 				}
-				
+
 			});
 			try {
 				hilightslist = hilightslistfuture.get();
 			} catch (Exception e) {
-				e.printStackTrace();
+				return;
 			}
-			if (hilightslist == null) return;
 			for (String hilight : hilightslist) {
 				if (contains(msg, hilight)) {
 					if (!player.getName().equals(sender.getName()) && !alreadymatched) {
