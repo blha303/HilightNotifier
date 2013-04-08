@@ -30,12 +30,14 @@ public class HilightNotifier extends JavaPlugin implements Listener {
             }
         }
         List<String> example = new ArrayList<String>();
-        example.add("blha303"); example.add("blha"); example.add("steven");
+        example.add("blha303");
+        example.add("blha");
+        example.add("steven");
         getConfig().addDefault("hilights.blha303", example);
         getConfig().options().copyDefaults(true);
         saveConfig();
     }
-    
+
     @Override
     public void onDisable() {
         saveConfig();
@@ -64,20 +66,20 @@ public class HilightNotifier extends JavaPlugin implements Listener {
             }
 
         });
-        try { 
-            playerlist = onlinePlayersFuture.get(); 
+        try {
+            playerlist = onlinePlayersFuture.get();
         } catch (Exception e) {
             return;
         }
 
-        if (playerlist == null) return;
+        if (playerlist == null)
+            return;
         for (final Player player : playerlist) {
             Future<List<String>> hilightslistfuture = getServer().getScheduler().callSyncMethod(this, new Callable<List<String>>() {
 
                 public List<String> call() throws Exception {
                     return getConfig().getStringList("hilights." + player.getName());
                 }
-                
 
             });
             try {
@@ -96,7 +98,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
                                 player.playSound(player.getLocation(), Sound.ORB_PICKUP, 10.0F, 1.0F);
                                 return null;
                             }
-                            
+
                         });
                         player.sendMessage(String.format(event.getFormat(), sender.getDisplayName(), newmessage));
                         alreadymatched = true;
@@ -105,12 +107,13 @@ public class HilightNotifier extends JavaPlugin implements Listener {
             }
         }
     }
-    
+
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (sender instanceof Player) {
-            List<String> list = getConfig().getStringList("hilights." + sender.getName());    
-            if (args.length == 0) return false;
-            for (int i = 0; i<args.length;) {
+            List<String> list = getConfig().getStringList("hilights." + sender.getName());
+            if (args.length == 0)
+                return false;
+            for (int i = 0; i < args.length;) {
                 if (list.contains(args[i])) {
                     sender.sendMessage("You already have that string set to ping you.");
                     return true;
@@ -125,14 +128,13 @@ public class HilightNotifier extends JavaPlugin implements Listener {
             if (args.length == 0) {
                 sender.sendMessage("Usage from console: /hladd <playername> <string>...");
                 return true;
-            } else
-            if (args.length == 1) {
+            } else if (args.length == 1) {
                 sender.sendMessage("Usage from console: /hladd <playername> <string>...");
                 return true;
             } else {
                 String name = getServer().getPlayer(args[0]).getName();
-                List<String> list = getConfig().getStringList("hilights." + name);    
-                for (int i = 1; i<args.length; i++) {
+                List<String> list = getConfig().getStringList("hilights." + name);
+                for (int i = 1; i < args.length; i++) {
                     if (list.contains(args[i])) {
                         sender.sendMessage("That player already has that string set to ping them.");
                         return true;
@@ -149,10 +151,10 @@ public class HilightNotifier extends JavaPlugin implements Listener {
                 sender.sendMessage(String.format("Hilight list for %s: %s", name, list.toArray().toString()));
                 return true;
             }
-            
+
         }
     }
-    
+
     // http://stackoverflow.com/a/2275030
     public boolean contains(String haystack, String needle) {
         haystack = haystack == null ? "" : haystack;
