@@ -1,0 +1,8 @@
+name: ${project.name}
+main: ${project.groupId}.${project.artifactId}
+version: ${project.version}
+author: blha303
+commands:
+  hladd:
+    description: Adds a new word to ping yourself with
+    usage: /hladd <word>...

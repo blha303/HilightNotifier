@@ -4,5 +4,31 @@ version: ${project.version}
 author: blha303
 commands:
   hladd:
-    description: Adds a new word to ping yourself with
+    description: Adds new word to ping yourself with
     usage: /hladd <word>...
+    permission: hilightnotifier.hladd
+  hldel:
+    description: Deletes words from the hilight list
+    usage: /hldel <word>...
+    permission: hilightnotifier.hldel
+    aliases: [hlrem, hlrm]
+  notify:
+    description: Pings the targeted player(s)
+    usage: /notify <name>...
+    permission: hilightnotifier.notify
+permissions:
+  hilightnotifier.*:
+    description: Allows a player to use all HilightNotifier permissions
+    children:
+      hilightnotifier.hladd: true
+      hilightnotifier.hldel: true
+      hilightnotifier.notify: true
+  hilightnotifier.hladd:
+    description: Allows a player to use /hladd
+    default: true
+  hilightnotifier.hldel:
+    description: Allows a player to use /hldel
+    default: true
+  hilightnotifier.notify:
+    description: Allows a player to use /notify
+    default: op
