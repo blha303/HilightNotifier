@@ -38,7 +38,6 @@ public class HilightNotifier extends JavaPlugin implements Listener {
         List<String> example = new ArrayList<String>();
         example.add("blha303");
         example.add("blha");
-        example.add("steven");
         getConfig().addDefault("hilights.blha303", example);
         getConfig().addDefault("debug", false);
         getConfig().options().copyDefaults(true);
@@ -74,7 +73,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
         Future<Player[]> onlinePlayersFuture = getServer().getScheduler().callSyncMethod(this, new Callable<Player[]>() {
 
             public Player[] call() throws Exception {
-                return getServer().getOnlinePlayers();
+                return (Player[]) getServer().getOnlinePlayers().toArray();
             }
 
         });
@@ -117,7 +116,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
                         getServer().getScheduler().callSyncMethod(this, new Callable<Object>() {
 
                             public Object call() throws Exception {
-                                player.playSound(player.getLocation(), Sound.ORB_PICKUP, 10.0F, 1.0F);
+                                player.playSound(player.getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 10.0F, 1.0F);
                                 return null;
                             }
 
@@ -141,7 +140,7 @@ public class HilightNotifier extends JavaPlugin implements Listener {
                     String player = getServer().getPlayer(name).getName();
                     if (player != null) {
                         getServer().getPlayer(player).sendMessage(ChatColor.YELLOW + sender.getName() + " pinged you!");
-                        getServer().getPlayer(player).playSound(getServer().getPlayer(player).getLocation(), Sound.ORB_PICKUP, 10.0F, 1.0F);
+                        getServer().getPlayer(player).playSound(getServer().getPlayer(player).getLocation(), Sound.ENTITY_EXPERIENCE_ORB_PICKUP, 10.0F, 1.0F);
                         return true;
                     } else {
                         sender.sendMessage(ChatColor.RED + "Could not match a player with " + name);

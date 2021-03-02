@@ -2,12 +2,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.blha303</groupId>
   <artifactId>HilightNotifier</artifactId>
-  <version>1.5</version>
+  <version>2.0</version>
   <name>HilightNotifier</name>
   <repositories>
     <repository>
       <id>bukkit-repo</id>
-      <url>http://repo.bukkit.org/content/groups/public</url>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
     </repository> <!-- 
     <repository>
         <id>mcstats-repo</id>
@@ -21,20 +21,14 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.0.2</version>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.8</source>
+          <target>1.8</target>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <version>2.1</version>
-        <configuration>
-          <archive>
-            <addMavenDescriptor>false</addMavenDescriptor>
-          </archive>
-          <finalName>${project.name}</finalName>
-        </configuration>
       </plugin>
     </plugins>
     <resources>
@@ -59,7 +53,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>1.5.1-R0.2-SNAPSHOT</version>
+      <version>1.15.2-R0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 </project>
